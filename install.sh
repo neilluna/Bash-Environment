@@ -11,14 +11,14 @@ echo_usage() {
   echo " --pip-requires-virtualenv Include pip requires virtualenv variable."
   echo "                           Implies --python-virtualenv."
   echo " --prompt                  Include prompt variable."
-  echo " --python-virtualenv       Include Python virtualenv variables."
+  echo " --python3-virtualenv      Include Python3 virtualenv variables."
   echo " -h, --help                Show this help information."
   echo " -v, --verbose             Verbose output."
 } 
 
 opt_pip_requires_virtualenv=no
 opt_prompt=no
-opt_python_virtualenv=no
+opt_python3_virtualenv=no
 opt_verbose=no
 
 while [ ${#} -gt 0 ]; do
@@ -26,7 +26,7 @@ while [ ${#} -gt 0 ]; do
     -a|--all)
       opt_pip_requires_virtualenv=yes
       opt_prompt=yes
-      opt_python_virtualenv=yes
+      opt_python3_virtualenv=yes
       shift
       ;;
     -h|--help)
@@ -35,15 +35,15 @@ while [ ${#} -gt 0 ]; do
       ;;
     --pip-requires-virtualenv)
       opt_pip_requires_virtualenv=yes
-      opt_python_virtualenv=yes
+      opt_python3_virtualenv=yes
       shift
       ;;
     --prompt)
       opt_prompt=yes
       shift
       ;;
-    --python-virtualenv)
-      opt_python_virtualenv=yes
+    --python3-virtualenv)
+      opt_python3_virtualenv=yes
       shift
       ;;
     -v|--verbose)
@@ -124,7 +124,7 @@ echo "${block_end} - ${block_warning}" >> ~/.bashrc
 # Delete the files that should not be included.
 [ ${opt_pip_requires_virtualenv} == no ] && rm -f ~/.bashrc.d/python-pip-require-virtualenv.sh
 [ ${opt_prompt} == no ] && rm -f ~/.bashrc.d/prompt.sh
-[ ${opt_python_virtualenv} == no ] && rm -f ~/.bashrc.d/python-virtualenv.sh
+[ ${opt_python3_virtualenv} == no ] && rm -f ~/.bashrc.d/python3-virtualenv.sh
 if [ -z "$(uname -s | grep -i cygwin)" ]; then
   rm -f ~/.bashrc.d/cygwin-vagrant-helper.sh
 fi
