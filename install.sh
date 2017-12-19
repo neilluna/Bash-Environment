@@ -1,35 +1,64 @@
 #!/usr/bin/env bash
 
 echo_usage() { 
-  echo "This script will install the various files for my environment."
+  echo "This script will install the various files for my Bash environment."
   echo
-  echo "Usage: ${0} [-v]"
+  echo "Usage:"
+  echo " $(basename ${BASH_SOURCE[0]}): [options]"
   echo
-  echo "  -h  Show this help information."
-  echo "  -v  Verbose output."
+  echo "Options:"
+  echo " -a, --all                 Include all of the following except --verbose."
+  echo " --pip-requires-virtualenv Include pip requires virtualenv variable."
+  echo "                           Implies --python-virtualenv."
+  echo " --prompt                  Include prompt variable."
+  echo " --python-virtualenv       Include Python virtualenv variables."
+  echo " -h, --help                Show this help information."
+  echo " -v, --verbose             Verbose output."
 } 
 
+opt_pip_requires_virtualenv=no
+opt_prompt=no
+opt_python_virtualenv=no
 opt_verbose=no
 
-while getopts ":hdlrt:v" opt; do
-  case "${opt}" in
-    h)
+while [ ${#} -gt 0 ]; do
+  case "${1}" in
+    -a|--all)
+      opt_pip_requires_virtualenv=yes
+      opt_prompt=yes
+      opt_python_virtualenv=yes
+      shift
+      ;;
+    -h|--help)
       echo_usage ${0}
       exit 0
       ;;
-    v)
-      opt_verbose=yes
+    --pip-requires-virtualenv)
+      opt_pip_requires_virtualenv=yes
+      opt_python_virtualenv=yes
+      shift
       ;;
-    \?)
-      echo "${0}: Error: Invalid option: -${optarg}" >&2
+    --prompt)
+      opt_prompt=yes
+      shift
+      ;;
+    --python-virtualenv)
+      opt_python_virtualenv=yes
+      shift
+      ;;
+    -v|--verbose)
+      opt_verbose=yes
+      shift
+      ;;
+    *)
+      echo "$(basename ${BASH_SOURCE[0]}): Error: Invalid option: ${1}" >&2
       echo_usage ${0}
       exit 1
       ;;
   esac
 done
 
-script_dir=$(dirname ${BASH_SOURCE[0]})
-cd ${script_dir}
+cd $(dirname ${BASH_SOURCE[0]})
 
 # Create a temporary copy script.
 tmp_cp_script=$(mktemp --tmpdir tmp_cp_XXXXXXXXXX.sh)
@@ -59,9 +88,7 @@ block_end='# Shell environment - End of block'
 block_warning='Do not remove or modify this line or any of the lines in this block.'
 
 # Install or replace ~/.bash_profile.d.
-if [ -d ~/.bash_profile.d ]; then
-  rm -rf ~/.bash_profile.d
-fi
+[ -d ~/.bash_profile.d ] && rm -rf ~/.bash_profile.d
 find .bash_profile.d -type d -exec mkdir -p ~/'{}' \;
 find .bash_profile.d -type f -exec ${tmp_cp_script} '{}' \;
 find ~/.bash_profile.d -type f -name '*.sh' -exec chmod u+x '{}' \;
@@ -79,9 +106,7 @@ EOF2
 echo "${block_end} - ${block_warning}" >> ${profile_script}
 
 # Install or replace ~/.bashrc.d.
-if [ -d ~/.bashrc.d ]; then
-  rm -rf ~/.bashrc.d
-fi
+[ -d ~/.bashrc.d ] && rm -rf ~/.bashrc.d
 find .bashrc.d -type d -exec mkdir -p ~/'{}' \;
 find .bashrc.d -type f -exec ${tmp_cp_script} '{}' \;
 find ~/.bashrc.d -type f -name '*.sh' -exec chmod u+x '{}' \;
@@ -95,6 +120,14 @@ for script in "${HOME}"/.bashrc.d/*.sh; do
 done
 EOF3
 echo "${block_end} - ${block_warning}" >> ~/.bashrc
+
+# Delete the files that should not be included.
+[ ${opt_pip_requires_virtualenv} == no ] && rm -f ~/.bashrc.d/python-pip-require-virtualenv.sh
+[ ${opt_prompt} == no ] && rm -f ~/.bashrc.d/prompt.sh
+[ ${opt_python_virtualenv} == no ] && rm -f ~/.bashrc.d/python-virtualenv.sh
+if [ -z "$(uname -s | grep -i cygwin)" ]; then
+  rm -f ~/.bashrc.d/cygwin-vagrant-helper.sh
+fi
 
 # Delete the temporary copy script.
 rm ${tmp_cp_script}
