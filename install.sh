@@ -9,7 +9,7 @@ echo_usage() {
   echo "Options:"
   echo " -a, --all                 Include all of the following except --verbose."
   echo " --pip-requires-virtualenv Include pip requires virtualenv variable."
-  echo "                           Implies --python-virtualenv."
+  echo "                           Implies --python3-virtualenv."
   echo " --prompt                  Include prompt variable."
   echo " --python3-virtualenv      Include Python3 virtualenv variables."
   echo " -h, --help                Show this help information."
