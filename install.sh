@@ -58,7 +58,7 @@ while [ ${#} -gt 0 ]; do
   esac
 done
 
-cd $(dirname ${BASH_SOURCE[0]})
+cd "$(dirname "${BASH_SOURCE[0]}")"
 
 # Create a temporary copy script.
 tmp_cp_script=$(mktemp --tmpdir tmp_cp_XXXXXXXXXX.sh)
@@ -94,16 +94,16 @@ find .bash_profile.d -type f -exec ${tmp_cp_script} '{}' \;
 find ~/.bash_profile.d -type f -name '*.sh' -exec chmod u+x '{}' \;
 
 # Install or replace the ~/.bash_profile.d script calls in the profile script.
-sed -i "/^${block_start}/,/^${block_end}/d" ${profile_script}
-echo "${block_start} - ${block_warning}" >> ${profile_script}
-cat << 'EOF2' >> ${profile_script}
+sed -i "/^${block_start}/,/^${block_end}/d" "${profile_script}"
+echo "${block_start} - ${block_warning}" >> "${profile_script}"
+cat << 'EOF2' >> "${profile_script}"
 if [ -n "${BASH_VERSION}" ]; then
   for script in "${HOME}"/.bash_profile.d/*.sh; do
     [ -f "${script}" ] && source "${script}"
   done
 fi
 EOF2
-echo "${block_end} - ${block_warning}" >> ${profile_script}
+echo "${block_end} - ${block_warning}" >> "${profile_script}"
 
 # Install or replace ~/.bashrc.d.
 [ -d ~/.bashrc.d ] && rm -rf ~/.bashrc.d
