@@ -7,13 +7,12 @@ echo_usage() {
   echo " $(basename ${BASH_SOURCE[0]}): [options]"
   echo
   echo "Options:"
-  echo " -a, --all                 Include all of the following except --verbose."
-  echo " --pip-requires-virtualenv Include pip requires virtualenv variable."
-  echo "                           Implies --python3-virtualenv."
-  echo " --prompt                  Include prompt variable."
-  echo " --python3-virtualenv      Include Python3 virtualenv variables."
-  echo " -h, --help                Show this help information."
-  echo " -v, --verbose             Verbose output."
+  echo " --pip-requires-virtualenv  Include PIP_REQUIRE_VIRTUALENV variable."
+  echo "                            Implies --python3-virtualenv."
+  echo " --prompt                   Include prompt variable."
+  echo " --python3-virtualenv       Include Python3 virtualenv variables."
+  echo " -h, --help                 Show this help information."
+  echo " -v, --verbose              Verbose output."
 } 
 
 opt_pip_requires_virtualenv=no
@@ -23,12 +22,6 @@ opt_verbose=no
 
 while [ ${#} -gt 0 ]; do
   case "${1}" in
-    -a|--all)
-      opt_pip_requires_virtualenv=yes
-      opt_prompt=yes
-      opt_python3_virtualenv=yes
-      shift
-      ;;
     -h|--help)
       echo_usage ${0}
       exit 0
@@ -128,6 +121,11 @@ for script in "${HOME}"/.bashrc.d/*.sh; do
 done
 EOF3
 echo "${block_end} - ${block_warning}" >> ~/.bashrc
+
+# Install or update ~/bin.
+[ ! -d ~/bin ] && mkdir -p ~/bin
+${tmp_cp_script} ${opt_verbose} bin/gitclone.sh ~/bin/gitclone.sh
+find ~/bin -type f -exec chmod u+x '{}' \;
 
 # Delete the temporary copy script.
 rm ${tmp_cp_script}
