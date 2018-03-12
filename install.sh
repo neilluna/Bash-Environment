@@ -68,7 +68,12 @@ cat << 'EOF1' > ${tmp_cp_script}
 # This script is used in order to avoid using multiple '{}' arguments in the '-exec' clause of the calling 'find'.
 # By 'find' standard, behavior using multiple '{}' arguments in the '-exec' clause is unspecified.
 
-cp --no-preserve=mode "${1}" ~/"${1}"
+opt_verbose=${1}
+src=${2}
+dst=${3}
+
+[ ${opt_verbose} == yes ] && echo Installing ${dst}
+cp --no-preserve=mode "${src}" "${dst}"
 EOF1
 chmod u+x ${tmp_cp_script}
 
@@ -87,13 +92,12 @@ block_start='# Shell environment - Start of block'
 block_end='# Shell environment - End of block'
 block_warning='Do not remove or modify this line or any of the lines in this block.'
 
-# Install or replace ~/.bash_profile.d.
-[ -d ~/.bash_profile.d ] && rm -rf ~/.bash_profile.d
-find .bash_profile.d -type d -exec mkdir -p ~/'{}' \;
-find .bash_profile.d -type f -exec ${tmp_cp_script} '{}' \;
+# Install or update ~/.bash_profile.d.
+[ ! -d ~/.bash_profile.d ] && mkdir -p ~/.bash_profile.d
+${tmp_cp_script} ${opt_verbose} .bash_profile.d/home-bin.sh ~/.bash_profile.d/home-bin.sh
 find ~/.bash_profile.d -type f -name '*.sh' -exec chmod u+x '{}' \;
 
-# Install or replace the ~/.bash_profile.d script calls in the profile script.
+# Install or replace the hook in the profile script.
 sed -i "/^${block_start}/,/^${block_end}/d" "${profile_script}"
 echo "${block_start} - ${block_warning}" >> "${profile_script}"
 cat << 'EOF2' >> "${profile_script}"
@@ -105,13 +109,17 @@ fi
 EOF2
 echo "${block_end} - ${block_warning}" >> "${profile_script}"
 
-# Install or replace ~/.bashrc.d.
-[ -d ~/.bashrc.d ] && rm -rf ~/.bashrc.d
-find .bashrc.d -type d -exec mkdir -p ~/'{}' \;
-find .bashrc.d -type f -exec ${tmp_cp_script} '{}' \;
+# Install or update ~/.bashrc.d.
+[ ! -d ~/.bashrc.d ] && mkdir -p ~/.bashrc.d
+[ ! -z "$(uname -s | grep -i cygwin)" ] && ${tmp_cp_script} ${opt_verbose} .bashrc.d/cygwin-vagrant-helper.sh ~/.bashrc.d/cygwin-vagrant-helper.sh
+${tmp_cp_script} ${opt_verbose} .bashrc.d/misc-aliases.sh ~/.bashrc.d/misc-aliases.sh
+${tmp_cp_script} ${opt_verbose} .bashrc.d/misc-vars.sh ~/.bashrc.d/misc-vars.sh
+[ ${opt_prompt} == yes ] && ${tmp_cp_script} ${opt_verbose} .bashrc.d/prompt.sh ~/.bashrc.d/prompt.sh
+[ ${opt_pip_requires_virtualenv} == yes ] && ${tmp_cp_script} ${opt_verbose} .bashrc.d/python-pip-require-virtualenv.sh ~/.bashrc.d/python-pip-require-virtualenv.sh
+[ ${opt_python3_virtualenv} == yes ] && ${tmp_cp_script} ${opt_verbose} .bashrc.d/python3-virtualenv.sh ~/.bashrc.d/python3-virtualenv.sh
 find ~/.bashrc.d -type f -name '*.sh' -exec chmod u+x '{}' \;
 
-# Install or replace the ~/.bashrc.d script calls in ~/.bashrc.
+# Install or replace the hook in ~/.bashrc.
 sed -i "/^${block_start}/,/^${block_end}/d" ~/.bashrc
 echo "${block_start} - ${block_warning}" >> ~/.bashrc
 cat << 'EOF3' >> ~/.bashrc
@@ -120,14 +128,6 @@ for script in "${HOME}"/.bashrc.d/*.sh; do
 done
 EOF3
 echo "${block_end} - ${block_warning}" >> ~/.bashrc
-
-# Delete the files that should not be included.
-[ ${opt_pip_requires_virtualenv} == no ] && rm -f ~/.bashrc.d/python-pip-require-virtualenv.sh
-[ ${opt_prompt} == no ] && rm -f ~/.bashrc.d/prompt.sh
-[ ${opt_python3_virtualenv} == no ] && rm -f ~/.bashrc.d/python3-virtualenv.sh
-if [ -z "$(uname -s | grep -i cygwin)" ]; then
-  rm -f ~/.bashrc.d/cygwin-vagrant-helper.sh
-fi
 
 # Delete the temporary copy script.
 rm ${tmp_cp_script}
