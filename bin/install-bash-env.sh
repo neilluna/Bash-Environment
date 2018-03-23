@@ -86,7 +86,10 @@ block_end='# Shell environment - End of block'
 block_warning='Do not remove or modify this line or any of the lines in this block.'
 
 # Install or update ~/.bash_profile.d.
-[ ! -d ~/.bash_profile.d ] && mkdir -p ~/.bash_profile.d
+if [ ! -d ~/.bash_profile.d ]; then
+  [ ${opt_verbose} == yes ] && echo Creating ~/.bash_profile.d
+  mkdir -p ~/.bash_profile.d
+fi
 ${tmp_cp_script} ${opt_verbose} .bash_profile.d/home-bin.sh ~/.bash_profile.d/home-bin.sh
 find ~/.bash_profile.d -type f -name '*.sh' -exec chmod u+x '{}' \;
 
@@ -103,7 +106,10 @@ EOF2
 echo "${block_end} - ${block_warning}" >> "${profile_script}"
 
 # Install or update ~/.bashrc.d.
-[ ! -d ~/.bashrc.d ] && mkdir -p ~/.bashrc.d
+if [ ! -d ~/.bashrc.d ]; then
+  [ ${opt_verbose} == yes ] && echo Creating ~/.bashrc.d
+  mkdir -p ~/.bashrc.d
+fi
 [ ! -z "$(uname -s | grep -i cygwin)" ] && ${tmp_cp_script} ${opt_verbose} .bashrc.d/cygwin-vagrant-helper.sh ~/.bashrc.d/cygwin-vagrant-helper.sh
 ${tmp_cp_script} ${opt_verbose} .bashrc.d/misc-aliases.sh ~/.bashrc.d/misc-aliases.sh
 ${tmp_cp_script} ${opt_verbose} .bashrc.d/misc-vars.sh ~/.bashrc.d/misc-vars.sh
@@ -123,7 +129,10 @@ EOF3
 echo "${block_end} - ${block_warning}" >> ~/.bashrc
 
 # Install or update ~/bin.
-[ ! -d ~/bin ] && mkdir -p ~/bin
+if [ ! -d ~/bin ]; then
+  [ ${opt_verbose} == yes ] && echo Creating ~/bin
+  mkdir -p ~/bin
+fi
 ${tmp_cp_script} ${opt_verbose} bin/gitclone.sh ~/bin/gitclone.sh
 find ~/bin -type f -exec chmod u+x '{}' \;
 
