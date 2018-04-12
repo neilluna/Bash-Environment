@@ -133,7 +133,10 @@ if [ ! -d ~/bin ]; then
   [ ${opt_verbose} == yes ] && echo Creating ~/bin
   mkdir -p ~/bin
 fi
-${tmp_cp_script} ${opt_verbose} bin/gitclone.sh ~/bin/gitclone.sh
+${tmp_cp_script} ${opt_verbose} bin/create-gitconfig.sh ~/bin/create-gitconfig.sh
+${tmp_cp_script} ${opt_verbose} bin/create-hgrc.sh ~/bin/create-hgrc.sh
+${tmp_cp_script} ${opt_verbose} bin/create-ssh-key.sh ~/bin/create-ssh-key.sh
+${tmp_cp_script} ${opt_verbose} bin/git-clone.sh ~/bin/git-clone.sh
 find ~/bin -type f -exec chmod u+x '{}' \;
 
 # Delete the temporary copy script.

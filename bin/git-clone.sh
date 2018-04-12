@@ -40,13 +40,13 @@ while [ ${#} -gt 0 ]; do
   esac
 done
 
-if [ -z ${remote} ]; then
+if [ -z "${remote}" ]; then
   echo "$(basename ${BASH_SOURCE[0]}): Error: Missing remote parameter" >&2
   echo_usage ${0}
   exit 1
 fi
 
-if [ -z ${local} ]; then
+if [ -z "${local}" ]; then
   local=$(basename -s .git ${remote})
 fi
 

@@ -37,7 +37,7 @@ while [ ${#} -gt 0 ]; do
   esac
 done
 
-if [ -z ${subject} ]; then
+if [ -z "${subject}" ]; then
   echo "$(basename ${BASH_SOURCE[0]}): Error: Missing subject parameter" >&2
   echo_usage ${0}
   exit 1
