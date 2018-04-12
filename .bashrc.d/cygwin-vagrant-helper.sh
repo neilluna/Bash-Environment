@@ -1,5 +1,5 @@
-# Vagrant needs help using Cygwin.
-if [ ! -z "$(uname -s | grep -i cygwin)" ]; then
-  export VAGRANT_DETECTED_OS=cygwin
-fi
+#!/usr/bin/env bash
+
+# Tell Vagrant to use the system SSH, not its embedded SSH.
+export VAGRANT_PREFER_SYSTEM_BIN=1
 
