@@ -1,11 +1,17 @@
 #!/usr/bin/env bash
 
 echo_usage() { 
-  echo "This script will create a default SSH private and public key. The keys will be"
-  echo "places in the ~/.ssh as id_rsa and id_rsa.pub."
+  echo "This script will create an SSH private and public key. The keys will be"
+  echo "placed in the current directory, and named the same as the key comment."
   echo
   echo "Usage:"
-  echo " $(basename ${BASH_SOURCE[0]}): [-v] subject"
+  echo " $(basename ${BASH_SOURCE[0]}): [-v] [subject]"
+  echo
+  echo " The key comment and key file basename will be created as follows:"
+  echo "   id_rsa_subject"
+  echo " If the subject parameter is not specified, it will default to:"
+  echo "   user_hostname_yymmdd"
+  echo " where yymmdd is the current date."
   echo
   echo "Options:"
   echo " -v, --verbose  Verbose output."
@@ -37,10 +43,22 @@ while [ ${#} -gt 0 ]; do
   esac
 done
 
+user=${USER}
+if [ ! -z "${C9_USER}" ]; then
+  user=${C9_USER}
+  [ ${opt_verbose} == yes ] && echo Cloud9 detected. The user will be ${user}.
+fi
+
 if [ -z "${subject}" ]; then
-  echo "$(basename ${BASH_SOURCE[0]}): Error: Missing subject parameter" >&2
-  echo_usage ${0}
-  exit 1
+  subject=${user}_$(hostname)_$(date +%Y%m%d)
+  [ ${opt_verbose} == yes ] && echo No subject given. The subject will be ${subject}.
+fi
+
+comment=id_rsa_${subject}
+key_file=${comment}
+
+if [ ${opt_verbose} == yes ]; then
+  echo The key comment will be ${comment}.
 fi
 
 # Create the .ssh directory if it does not exist.
@@ -50,24 +68,20 @@ if [ ! -d ~/.ssh ]; then
   chmod 700 ~/.ssh
 fi
 
-if [ -f ~/.ssh/id_rsa ]; then
-  echo "$(basename ${BASH_SOURCE[0]}): Error: ~/.ssh/id_rsa already exists" >&2
+if [ -f ${key_file} ]; then
+  echo "$(basename ${BASH_SOURCE[0]}): Error: ${key_file} already exists." >&2
   exit 1
 fi
 
-if [ -f ~/.ssh/id_rsa.pub ]; then
-  echo "$(basename ${BASH_SOURCE[0]}): Error: ~/.ssh/id_rsa.pub already exists" >&2
+if [ -f ${key_file}.pub ]; then
+  echo "$(basename ${BASH_SOURCE[0]}): Error: ${key_file}.pub already exists." >&2
   exit 1
 fi
 
-user=${USER}
-if [ ! -z "${C9_USER}" ]; then
-  subject=c9_${subject}
-  user=${C9_USER}
+ssh-keygen -C ${comment} -f ${key_file} -N "" || exit 1
+if [ ${opt_verbose} == yes ]; then
+  echo "${key_file}.pub contains:"
+  cat ${key_file}.pub
 fi
-
-ssh-keygen -C id_rsa_${user}_${subject}_$(date +%Y%m%d) -f ~/.ssh/id_rsa -N "" || exit 1
-echo "~/.ssh/id_rsa.pub contains:"
-cat ~/.ssh/id_rsa.pub
 
 exit 0
