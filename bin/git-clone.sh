@@ -2,7 +2,7 @@
 
 echo_usage() { 
   echo "This script will clone a Git repository, disable autocrlf and filemode, and"
-  echo "fetch and pull all remote branches."
+  echo "pull all remote branches."
   echo
   echo "Usage:"
   echo " $(basename ${BASH_SOURCE[0]}): [-v] remote [local]"
@@ -61,22 +61,18 @@ git clone ${remote} ${local} || exit 1
 cd ${local} || exit 1
 
 # Fix autocrlf and filemode. Cygwin gets it wrong.
+[ ${opt_verbose} == yes ] && echo "Fixing autocrlf ..."
 git config core.autocrlf false || exit 1
+[ ${opt_verbose} == yes ] && echo "Fixing filemode ..."
 git config core.filemode false || exit 1
 
-# Get the default branch name.
-def_branch=$(basename $(git symbolic-ref HEAD))
-[ ${opt_verbose} == yes ] && echo "The default branch is ${def_branch}"
+if [ ${opt_verbose} == yes ]; then
+  git-update.sh --verbose
+else
+  git-update.sh
+fi
 
-# Track all remote branches.
-for branch in `git branch -a | grep remotes | grep -v HEAD | grep -v remotes/origin/${def_branch}`; do
-  [ ${opt_verbose} == yes ] && echo "Tracking ${branch} as ${branch#remotes/origin/} ..."
-  git branch --track ${branch#remotes/origin/} ${branch} || exit 1
-done
-
-# Fetch and pull all remote branches.
-[ ${opt_verbose} == yes ] && echo "Fetching all remote branches ..."
-git fetch --all || exit 1
+# Pull all tracked remote branches.
 [ ${opt_verbose} == yes ] && echo "Pulling all remote branches ..."
 git pull --all || exit 1
 

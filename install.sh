@@ -137,6 +137,7 @@ ${tmp_cp_script} ${opt_verbose} bin/create-gitconfig.sh ~/bin/create-gitconfig.s
 ${tmp_cp_script} ${opt_verbose} bin/create-hgrc.sh ~/bin/create-hgrc.sh
 ${tmp_cp_script} ${opt_verbose} bin/create-ssh-key.sh ~/bin/create-ssh-key.sh
 ${tmp_cp_script} ${opt_verbose} bin/git-clone.sh ~/bin/git-clone.sh
+${tmp_cp_script} ${opt_verbose} bin/git-update.sh ~/bin/git-update.sh
 find ~/bin -type f -exec chmod u+x '{}' \;
 
 # Delete the temporary copy script.
