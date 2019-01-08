@@ -72,8 +72,4 @@ else
 	git-update.sh
 fi
 
-# Pull all tracked remote branches.
-[ ${opt_verbose} == yes ] && echo "Pulling all remote branches ..."
-git pull --all || exit 1
-
 exit 0
