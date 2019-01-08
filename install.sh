@@ -1,18 +1,18 @@
 #!/usr/bin/env bash
 
 echo_usage() { 
-  echo "This script will install the various files for my Bash environment."
-  echo
-  echo "Usage:"
-  echo " $(basename ${BASH_SOURCE[0]}): [options]"
-  echo
-  echo "Options:"
-  echo " --pip-requires-virtualenv  Include PIP_REQUIRE_VIRTUALENV variable."
-  echo "                            Implies --python3-virtualenv."
-  echo " --prompt                   Include prompt variable."
-  echo " --python3-virtualenv       Include Python3 virtualenv variables."
-  echo " -h, --help                 Show this help information."
-  echo " -v, --verbose              Verbose output."
+	echo "This script will install the various files for my Bash environment."
+	echo
+	echo "Usage:"
+	echo " $(basename ${BASH_SOURCE[0]}): [options]"
+	echo
+	echo "Options:"
+	echo " --pip-requires-virtualenv  Include PIP_REQUIRE_VIRTUALENV variable."
+	echo "                            Implies --python3-virtualenv."
+	echo " --prompt                   Include prompt variable."
+	echo " --python3-virtualenv       Include Python3 virtualenv variables."
+	echo " -h, --help                 Show this help information."
+	echo " -v, --verbose              Verbose output."
 } 
 
 opt_pip_requires_virtualenv=no
@@ -21,34 +21,34 @@ opt_python3_virtualenv=no
 opt_verbose=no
 
 while [ ${#} -gt 0 ]; do
-  case "${1}" in
-    -h|--help)
-      echo_usage ${0}
-      exit 0
-      ;;
-    --pip-requires-virtualenv)
-      opt_pip_requires_virtualenv=yes
-      opt_python3_virtualenv=yes
-      shift
-      ;;
-    --prompt)
-      opt_prompt=yes
-      shift
-      ;;
-    --python3-virtualenv)
-      opt_python3_virtualenv=yes
-      shift
-      ;;
-    -v|--verbose)
-      opt_verbose=yes
-      shift
-      ;;
-    *)
-      echo "$(basename ${BASH_SOURCE[0]}): Error: Invalid option: ${1}" >&2
-      echo_usage ${0}
-      exit 1
-      ;;
-  esac
+	case "${1}" in
+		-h|--help)
+			echo_usage ${0}
+			exit 0
+			;;
+		--pip-requires-virtualenv)
+			opt_pip_requires_virtualenv=yes
+			opt_python3_virtualenv=yes
+			shift
+			;;
+		--prompt)
+			opt_prompt=yes
+			shift
+			;;
+		--python3-virtualenv)
+			opt_python3_virtualenv=yes
+			shift
+			;;
+		-v|--verbose)
+			opt_verbose=yes
+			shift
+			;;
+		*)
+			echo "$(basename ${BASH_SOURCE[0]}): Error: Invalid option: ${1}" >&2
+			echo_usage ${0}
+			exit 1
+			;;
+	esac
 done
 
 cd "$(dirname "${BASH_SOURCE[0]}")"
@@ -73,11 +73,11 @@ chmod u+x ${tmp_cp_script}
 # Find the correct profile or login script.
 profile_script=~/.bash_profile
 if [ -f ~/.bash_profile ]; then
-  profile_script=~/.bash_profile
+	profile_script=~/.bash_profile
 elif [ -f ~/.bash_login ]; then
-  profile_script=~/.bash_login
+	profile_script=~/.bash_login
 elif [ -f ~/.profile ]; then
-  profile_script=~/.profile
+	profile_script=~/.profile
 fi
 
 # Text lines that delimit the ~/.bash_profile.d and ~/.bashrc.d script calls in ~/.bash_profile and ~/.bashrc.
@@ -87,8 +87,8 @@ block_warning='Do not remove or modify this line or any of the lines in this blo
 
 # Install or update ~/.bash_profile.d.
 if [ ! -d ~/.bash_profile.d ]; then
-  [ ${opt_verbose} == yes ] && echo Creating ~/.bash_profile.d
-  mkdir -p ~/.bash_profile.d
+	[ ${opt_verbose} == yes ] && echo Creating ~/.bash_profile.d
+	mkdir -p ~/.bash_profile.d
 fi
 ${tmp_cp_script} ${opt_verbose} .bash_profile.d/home-bin.sh ~/.bash_profile.d/home-bin.sh
 ${tmp_cp_script} ${opt_verbose} .bash_profile.d/xdg-dirs-vars.sh ~/.bash_profile.d/xdg-dirs-vars.sh
@@ -99,17 +99,17 @@ sed -i "/^${block_start}/,/^${block_end}/d" "${profile_script}"
 echo "${block_start} - ${block_warning}" >> "${profile_script}"
 cat << 'EOF2' >> "${profile_script}"
 if [ -n "${BASH_VERSION}" ]; then
-  for script in "${HOME}"/.bash_profile.d/*.sh; do
-    [ -f "${script}" ] && source "${script}"
-  done
+	for script in "${HOME}"/.bash_profile.d/*.sh; do
+		[ -f "${script}" ] && source "${script}"
+	done
 fi
 EOF2
 echo "${block_end} - ${block_warning}" >> "${profile_script}"
 
 # Install or update ~/.bashrc.d.
 if [ ! -d ~/.bashrc.d ]; then
-  [ ${opt_verbose} == yes ] && echo Creating ~/.bashrc.d
-  mkdir -p ~/.bashrc.d
+	[ ${opt_verbose} == yes ] && echo Creating ~/.bashrc.d
+	mkdir -p ~/.bashrc.d
 fi
 [ ! -z "$(uname -s | grep -i cygwin)" ] && ${tmp_cp_script} ${opt_verbose} .bashrc.d/cygwin-vagrant-helper.sh ~/.bashrc.d/cygwin-vagrant-helper.sh
 ${tmp_cp_script} ${opt_verbose} .bashrc.d/misc-aliases.sh ~/.bashrc.d/misc-aliases.sh
@@ -124,15 +124,15 @@ sed -i "/^${block_start}/,/^${block_end}/d" ~/.bashrc
 echo "${block_start} - ${block_warning}" >> ~/.bashrc
 cat << 'EOF3' >> ~/.bashrc
 for script in "${HOME}"/.bashrc.d/*.sh; do
-  [ -f "${script}" ] && source "${script}"
+	[ -f "${script}" ] && source "${script}"
 done
 EOF3
 echo "${block_end} - ${block_warning}" >> ~/.bashrc
 
 # Install or update ~/bin.
 if [ ! -d ~/bin ]; then
-  [ ${opt_verbose} == yes ] && echo Creating ~/bin
-  mkdir -p ~/bin
+	[ ${opt_verbose} == yes ] && echo Creating ~/bin
+	mkdir -p ~/bin
 fi
 ${tmp_cp_script} ${opt_verbose} bin/create-gitconfig.sh ~/bin/create-gitconfig.sh
 ${tmp_cp_script} ${opt_verbose} bin/create-hgrc.sh ~/bin/create-hgrc.sh

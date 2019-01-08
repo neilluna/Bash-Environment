@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## 5.1.0 - 2019-01-08
+### Fixed
+- Miscellaneous fixes for git-clone.sh and git-update.sh.
+
 ## 5.0.0 - 2019-01-04
 ### Added
 - xdg-dirs-vars.sh to handle XDG_DATA_HOME, XDG_CONFIG_HOME, and XDG_CACHE_HOME.
