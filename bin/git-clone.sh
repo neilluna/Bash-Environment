@@ -11,6 +11,27 @@ echo_usage() {
 	echo " -v, --verbose  Verbose output."
 } 
 
+# ANSI color escape sequences for use in echo_color().
+black='\e[30m'
+red='\e[31m'
+green='\e[32m'
+yellow='\e[33m'
+blue='\e[34m'
+magenta='\e[35m'
+cyan='\e[36m'
+white='\e[37m'
+reset='\e[0m'
+
+# Using ANSI escape codes for color works, yet tput does not.
+# This may be caused by tput not being able to determine the terminal type.
+function echo_color()
+{
+	color=${1}
+	message=${2}
+	echo -e "${color}${message}${reset}"
+}
+
+# Command-line switch variables.
 remote=
 local=
 opt_verbose=no
@@ -56,20 +77,32 @@ if [ -d ${local} ]; then
 fi
 
 # Clone the repo and change to its directory.
-[ ${opt_verbose} == yes ] && echo "Cloning ${remote} to ${local} ..."
+[ ${opt_verbose} == yes ] && echo_color ${cyan} "Cloning ${remote} to ${local} ..."
 git clone ${remote} ${local} || exit 1
 cd ${local} || exit 1
 
 # Fix autocrlf and filemode. Cygwin gets it wrong.
-[ ${opt_verbose} == yes ] && echo "Fixing autocrlf ..."
+[ ${opt_verbose} == yes ] && echo_color ${cyan} "Fixing autocrlf ..."
 git config core.autocrlf false || exit 1
-[ ${opt_verbose} == yes ] && echo "Fixing filemode ..."
+[ ${opt_verbose} == yes ] && echo_color ${cyan} "Fixing filemode ..."
 git config core.filemode false || exit 1
 
-if [ ${opt_verbose} == yes ]; then
-	git-update.sh --verbose
-else
-	git-update.sh
+# Get the default branch name.
+default_branch=$(git remote show origin | grep "HEAD branch" | awk '{print $3}')
+[ ${opt_verbose} == yes ] && echo_color ${cyan} "The default branch is ${default_branch}"
+
+# Track all remote branches.
+tracking_additional_branches=false
+for branch in $(git branch --all | grep '^\s*remotes' | awk '$1!~/HEAD$/' | grep -v "^\s*remotes/origin/${default_branch}"); do
+	[ ${opt_verbose} == yes ] && echo_color ${cyan} "Tracking ${branch} as ${branch#remotes/origin/} ..."
+	git branch --track ${branch#remotes/origin/} ${branch} || exit 1
+	tracking_additional_branches=true
+done
+
+if [ ${tracking_additional_branches} == true ] ; then
+	[ ${opt_verbose} == yes ] && echo_color ${cyan} "Pulling all tracked branches ..."
+	git pull --all || exit 1
+	exit 1
 fi
 
 exit 0
