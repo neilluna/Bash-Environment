@@ -9,6 +9,8 @@ echo_usage() {
 	echo "Options:"
 	echo " --pip-requires-virtualenv  Include PIP_REQUIRE_VIRTUALENV variable."
 	echo "                            Implies --python3-virtualenv."
+	echo " --pipenv-venv-in-project   Include PIPENV_VENV_IN_PROJECT variable."
+	echo "                            Implies --python3-virtualenv."
 	echo " --prompt                   Include prompt variable."
 	echo " --python3-virtualenv       Include Python3 virtualenv variables."
 	echo " -h, --help                 Show this help information."
@@ -16,6 +18,7 @@ echo_usage() {
 } 
 
 opt_pip_requires_virtualenv=no
+opt_pipenv_venv_in_project=no
 opt_prompt=no
 opt_python3_virtualenv=no
 opt_verbose=no
@@ -28,6 +31,11 @@ while [ ${#} -gt 0 ]; do
 			;;
 		--pip-requires-virtualenv)
 			opt_pip_requires_virtualenv=yes
+			opt_python3_virtualenv=yes
+			shift
+			;;
+		--pipenv-venv-in-project)
+			opt_pipenv_venv_in_project=yes
 			opt_python3_virtualenv=yes
 			shift
 			;;
@@ -116,6 +124,7 @@ ${tmp_cp_script} ${opt_verbose} .bashrc.d/misc-aliases.sh ~/.bashrc.d/misc-alias
 ${tmp_cp_script} ${opt_verbose} .bashrc.d/misc-vars.sh ~/.bashrc.d/misc-vars.sh
 [ ${opt_prompt} == yes ] && ${tmp_cp_script} ${opt_verbose} .bashrc.d/prompt.sh ~/.bashrc.d/prompt.sh
 [ ${opt_pip_requires_virtualenv} == yes ] && ${tmp_cp_script} ${opt_verbose} .bashrc.d/python-pip-require-virtualenv.sh ~/.bashrc.d/python-pip-require-virtualenv.sh
+[ ${opt_pipenv_venv_in_project} == yes ] && ${tmp_cp_script} ${opt_verbose} .bashrc.d/pipenv-venv-in-project.sh ~/.bashrc.d/pipenv-venv-in-project.sh
 [ ${opt_python3_virtualenv} == yes ] && ${tmp_cp_script} ${opt_verbose} .bashrc.d/python3-virtualenv.sh ~/.bashrc.d/python3-virtualenv.sh
 find ~/.bashrc.d -type f -name '*.sh' -exec chmod u+x '{}' \;
 
