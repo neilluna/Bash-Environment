@@ -123,7 +123,7 @@ fi
 ${tmp_cp_script} ${opt_verbose} .bashrc.d/misc-aliases.sh ~/.bashrc.d/misc-aliases.sh
 ${tmp_cp_script} ${opt_verbose} .bashrc.d/misc-vars.sh ~/.bashrc.d/misc-vars.sh
 [ ${opt_prompt} == yes ] && ${tmp_cp_script} ${opt_verbose} .bashrc.d/prompt.sh ~/.bashrc.d/prompt.sh
-[ ${opt_pip_requires_virtualenv} == yes ] && ${tmp_cp_script} ${opt_verbose} .bashrc.d/python-pip-require-virtualenv.sh ~/.bashrc.d/python-pip-require-virtualenv.sh
+[ ${opt_pip_requires_virtualenv} == yes ] && ${tmp_cp_script} ${opt_verbose} .bashrc.d/pip-require-virtualenv.sh ~/.bashrc.d/pip-require-virtualenv.sh
 [ ${opt_pipenv_venv_in_project} == yes ] && ${tmp_cp_script} ${opt_verbose} .bashrc.d/pipenv-venv-in-project.sh ~/.bashrc.d/pipenv-venv-in-project.sh
 [ ${opt_python3_virtualenv} == yes ] && ${tmp_cp_script} ${opt_verbose} .bashrc.d/python3-virtualenv.sh ~/.bashrc.d/python3-virtualenv.sh
 find ~/.bashrc.d -type f -name '*.sh' -exec chmod u+x '{}' \;
