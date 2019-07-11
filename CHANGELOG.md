@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## 6.0.0 - 2019-07-11
+### Added
+- pipenv-venv-in-project.sh to handle PIPENV_VENV_IN_PROJECT.
+- Option --pipenv-venv-in-project to install pipenv-venv-in-project.sh.
+### Changed
+- Renamed python-pip-require-virtualenv.sh to pip-require-virtualenv.sh.
+- Added a --version option to install.sh.
+
 ## 5.1.0 - 2019-01-08
 ### Fixed
 - Miscellaneous fixes for git-clone.sh and git-update.sh.

@@ -1,21 +1,32 @@
 #!/usr/bin/env bash
 
+version=6.0.0
+
+echo_version() { 
+	echo "Bash environment installation - Version ${version}"
+} 
+
 echo_usage() { 
-	echo "This script will install the various files for my Bash environment."
+	echo_version
+	echo "This script will install an extensible Bash environment."
 	echo
 	echo "Usage:"
 	echo " $(basename ${BASH_SOURCE[0]}): [options]"
 	echo
 	echo "Options:"
+	echo " -h, --help                 Show this help information."
 	echo " --pip-requires-virtualenv  Include PIP_REQUIRE_VIRTUALENV variable."
+	echo "                            Implies --python3-virtualenv."
+	echo " --pipenv-venv-in-project   Include PIPENV_VENV_IN_PROJECT variable."
 	echo "                            Implies --python3-virtualenv."
 	echo " --prompt                   Include prompt variable."
 	echo " --python3-virtualenv       Include Python3 virtualenv variables."
-	echo " -h, --help                 Show this help information."
 	echo " -v, --verbose              Verbose output."
+	echo " --version                  Show the version."
 } 
 
 opt_pip_requires_virtualenv=no
+opt_pipenv_venv_in_project=no
 opt_prompt=no
 opt_python3_virtualenv=no
 opt_verbose=no
@@ -31,6 +42,11 @@ while [ ${#} -gt 0 ]; do
 			opt_python3_virtualenv=yes
 			shift
 			;;
+		--pipenv-venv-in-project)
+			opt_pipenv_venv_in_project=yes
+			opt_python3_virtualenv=yes
+			shift
+			;;
 		--prompt)
 			opt_prompt=yes
 			shift
@@ -42,6 +58,10 @@ while [ ${#} -gt 0 ]; do
 		-v|--verbose)
 			opt_verbose=yes
 			shift
+			;;
+		--version)
+			echo_version
+			exit 0
 			;;
 		*)
 			echo "$(basename ${BASH_SOURCE[0]}): Error: Invalid option: ${1}" >&2
@@ -115,7 +135,8 @@ fi
 ${tmp_cp_script} ${opt_verbose} .bashrc.d/misc-aliases.sh ~/.bashrc.d/misc-aliases.sh
 ${tmp_cp_script} ${opt_verbose} .bashrc.d/misc-vars.sh ~/.bashrc.d/misc-vars.sh
 [ ${opt_prompt} == yes ] && ${tmp_cp_script} ${opt_verbose} .bashrc.d/prompt.sh ~/.bashrc.d/prompt.sh
-[ ${opt_pip_requires_virtualenv} == yes ] && ${tmp_cp_script} ${opt_verbose} .bashrc.d/python-pip-require-virtualenv.sh ~/.bashrc.d/python-pip-require-virtualenv.sh
+[ ${opt_pip_requires_virtualenv} == yes ] && ${tmp_cp_script} ${opt_verbose} .bashrc.d/pip-require-virtualenv.sh ~/.bashrc.d/pip-require-virtualenv.sh
+[ ${opt_pipenv_venv_in_project} == yes ] && ${tmp_cp_script} ${opt_verbose} .bashrc.d/pipenv-venv-in-project.sh ~/.bashrc.d/pipenv-venv-in-project.sh
 [ ${opt_python3_virtualenv} == yes ] && ${tmp_cp_script} ${opt_verbose} .bashrc.d/python3-virtualenv.sh ~/.bashrc.d/python3-virtualenv.sh
 find ~/.bashrc.d -type f -name '*.sh' -exec chmod u+x '{}' \;
 
