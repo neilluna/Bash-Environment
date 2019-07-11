@@ -10,6 +10,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) a
 - Option --pipenv-venv-in-project to install pipenv-venv-in-project.sh.
 ### Changed
 - Renamed python-pip-require-virtualenv.sh to pip-require-virtualenv.sh.
+- Added a --version option to install.sh.
 
 ## 5.1.0 - 2019-01-08
 ### Fixed

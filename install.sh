@@ -1,20 +1,28 @@
 #!/usr/bin/env bash
 
+version=6.0.0
+
+echo_version() { 
+	echo "Bash environment installation - Version ${version}"
+} 
+
 echo_usage() { 
-	echo "This script will install the various files for my Bash environment."
+	echo_version
+	echo "This script will install an extensible Bash environment."
 	echo
 	echo "Usage:"
 	echo " $(basename ${BASH_SOURCE[0]}): [options]"
 	echo
 	echo "Options:"
+	echo " -h, --help                 Show this help information."
 	echo " --pip-requires-virtualenv  Include PIP_REQUIRE_VIRTUALENV variable."
 	echo "                            Implies --python3-virtualenv."
 	echo " --pipenv-venv-in-project   Include PIPENV_VENV_IN_PROJECT variable."
 	echo "                            Implies --python3-virtualenv."
 	echo " --prompt                   Include prompt variable."
 	echo " --python3-virtualenv       Include Python3 virtualenv variables."
-	echo " -h, --help                 Show this help information."
 	echo " -v, --verbose              Verbose output."
+	echo " --version                  Show the version."
 } 
 
 opt_pip_requires_virtualenv=no
@@ -50,6 +58,10 @@ while [ ${#} -gt 0 ]; do
 		-v|--verbose)
 			opt_verbose=yes
 			shift
+			;;
+		--version)
+			echo_version
+			exit 0
 			;;
 		*)
 			echo "$(basename ${BASH_SOURCE[0]}): Error: Invalid option: ${1}" >&2
