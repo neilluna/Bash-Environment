@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-version=6.0.0
+version=7.0.0
 
 echo_version() { 
 	echo "Bash environment installation - Version ${version}"
@@ -71,95 +71,59 @@ while [ ${#} -gt 0 ]; do
 	esac
 done
 
+function copy()
+{
+	opt_verbose=${1}
+	src=${2}
+	dst=${3}
+
+	[ ${opt_verbose} == yes ] && echo Installing ${dst} ...
+	cp --no-preserve=mode "${src}" "${dst}"
+}
+
+# Change to the directory of this script.
 cd "$(dirname "${BASH_SOURCE[0]}")"
-
-# Create a temporary copy script.
-tmp_cp_script=$(mktemp --tmpdir tmp_cp_XXXXXXXXXX.sh)
-cat << 'EOF1' > ${tmp_cp_script}
-#!/usr/bin/env bash
-
-# This script is used in order to avoid using multiple '{}' arguments in the '-exec' clause of the calling 'find'.
-# By 'find' standard, behavior using multiple '{}' arguments in the '-exec' clause is unspecified.
-
-opt_verbose=${1}
-src=${2}
-dst=${3}
-
-[ ${opt_verbose} == yes ] && echo Installing ${dst}
-cp --no-preserve=mode "${src}" "${dst}"
-EOF1
-chmod u+x ${tmp_cp_script}
-
-# Find the correct profile or login script.
-profile_script=~/.bash_profile
-if [ -f ~/.bash_profile ]; then
-	profile_script=~/.bash_profile
-elif [ -f ~/.bash_login ]; then
-	profile_script=~/.bash_login
-elif [ -f ~/.profile ]; then
-	profile_script=~/.profile
-fi
-
-# Text lines that delimit the ~/.bash_profile.d and ~/.bashrc.d script calls in ~/.bash_profile and ~/.bashrc.
-block_start='# Shell environment - Start of block'
-block_end='# Shell environment - End of block'
-block_warning='Do not remove or modify this line or any of the lines in this block.'
-
-# Install or update ~/.bash_profile.d.
-if [ ! -d ~/.bash_profile.d ]; then
-	[ ${opt_verbose} == yes ] && echo Creating ~/.bash_profile.d
-	mkdir -p ~/.bash_profile.d
-fi
-${tmp_cp_script} ${opt_verbose} .bash_profile.d/home-bin.sh ~/.bash_profile.d/home-bin.sh
-${tmp_cp_script} ${opt_verbose} .bash_profile.d/xdg-dirs-vars.sh ~/.bash_profile.d/xdg-dirs-vars.sh
-find ~/.bash_profile.d -type f -name '*.sh' -exec chmod u+x '{}' \;
-
-# Install or replace the hook in the profile script.
-sed -i "/^${block_start}/,/^${block_end}/d" "${profile_script}"
-echo "${block_start} - ${block_warning}" >> "${profile_script}"
-cat << 'EOF2' >> "${profile_script}"
-if [ -n "${BASH_VERSION}" ]; then
-	for script in "${HOME}"/.bash_profile.d/*.sh; do
-		[ -f "${script}" ] && source "${script}"
-	done
-fi
-EOF2
-echo "${block_end} - ${block_warning}" >> "${profile_script}"
-
-# Install or update ~/.bashrc.d.
-if [ ! -d ~/.bashrc.d ]; then
-	[ ${opt_verbose} == yes ] && echo Creating ~/.bashrc.d
-	mkdir -p ~/.bashrc.d
-fi
-[ ! -z "$(uname -s | grep -i cygwin)" ] && ${tmp_cp_script} ${opt_verbose} .bashrc.d/cygwin-vagrant-helper.sh ~/.bashrc.d/cygwin-vagrant-helper.sh
-${tmp_cp_script} ${opt_verbose} .bashrc.d/misc-aliases.sh ~/.bashrc.d/misc-aliases.sh
-${tmp_cp_script} ${opt_verbose} .bashrc.d/misc-vars.sh ~/.bashrc.d/misc-vars.sh
-[ ${opt_prompt} == yes ] && ${tmp_cp_script} ${opt_verbose} .bashrc.d/prompt.sh ~/.bashrc.d/prompt.sh
-[ ${opt_pip_requires_virtualenv} == yes ] && ${tmp_cp_script} ${opt_verbose} .bashrc.d/pip-require-virtualenv.sh ~/.bashrc.d/pip-require-virtualenv.sh
-[ ${opt_pipenv_venv_in_project} == yes ] && ${tmp_cp_script} ${opt_verbose} .bashrc.d/pipenv-venv-in-project.sh ~/.bashrc.d/pipenv-venv-in-project.sh
-[ ${opt_python3_virtualenv} == yes ] && ${tmp_cp_script} ${opt_verbose} .bashrc.d/python3-virtualenv.sh ~/.bashrc.d/python3-virtualenv.sh
-find ~/.bashrc.d -type f -name '*.sh' -exec chmod u+x '{}' \;
-
-# Install or replace the hook in ~/.bashrc.
-sed -i "/^${block_start}/,/^${block_end}/d" ~/.bashrc
-echo "${block_start} - ${block_warning}" >> ~/.bashrc
-cat << 'EOF3' >> ~/.bashrc
-for script in "${HOME}"/.bashrc.d/*.sh; do
-	[ -f "${script}" ] && source "${script}"
-done
-EOF3
-echo "${block_end} - ${block_warning}" >> ~/.bashrc
 
 # Install or update ~/bin.
 if [ ! -d ~/bin ]; then
 	[ ${opt_verbose} == yes ] && echo Creating ~/bin
 	mkdir -p ~/bin
 fi
-${tmp_cp_script} ${opt_verbose} bin/create-gitconfig.sh ~/bin/create-gitconfig.sh
-${tmp_cp_script} ${opt_verbose} bin/create-hgrc.sh ~/bin/create-hgrc.sh
-${tmp_cp_script} ${opt_verbose} bin/create-ssh-key.sh ~/bin/create-ssh-key.sh
-${tmp_cp_script} ${opt_verbose} bin/git-clone.sh ~/bin/git-clone.sh
+copy ${opt_verbose} bin/create-gitconfig.sh ~/bin/create-gitconfig.sh
+copy ${opt_verbose} bin/create-hgrc.sh ~/bin/create-hgrc.sh
+copy ${opt_verbose} bin/create-ssh-key.sh ~/bin/create-ssh-key.sh
+copy ${opt_verbose} bin/git-clone.sh ~/bin/git-clone.sh
+copy ${opt_verbose} bin/source-bashrc.d-scripts.sh ~/bin/source-bashrc.d-scripts.sh
 find ~/bin -type f -exec chmod u+x '{}' \;
 
-# Delete the temporary copy script.
-rm ${tmp_cp_script}
+# Install or update ~/.bashrc.d.
+if [ ! -d ~/.bashrc.d ]; then
+	[ ${opt_verbose} == yes ] && echo Creating ~/.bashrc.d
+	mkdir -p ~/.bashrc.d
+fi
+[ ! -z "$(uname -s | grep -i cygwin)" ] && copy ${opt_verbose} .bashrc.d/cygwin-vagrant-helper.sh ~/.bashrc.d/cygwin-vagrant-helper.sh
+copy ${opt_verbose} .bashrc.d/home-bin.sh ~/.bashrc.d/home-bin.sh
+copy ${opt_verbose} .bashrc.d/misc-aliases.sh ~/.bashrc.d/misc-aliases.sh
+copy ${opt_verbose} .bashrc.d/misc-vars.sh ~/.bashrc.d/misc-vars.sh
+copy ${opt_verbose} .bashrc.d/xdg-dirs-vars.sh ~/.bashrc.d/xdg-dirs-vars.sh
+[ ${opt_prompt} == yes ] && copy ${opt_verbose} .bashrc.d/prompt.sh ~/.bashrc.d/prompt.sh
+[ ${opt_pip_requires_virtualenv} == yes ] && copy ${opt_verbose} .bashrc.d/pip-require-virtualenv.sh ~/.bashrc.d/pip-require-virtualenv.sh
+[ ${opt_pipenv_venv_in_project} == yes ] && copy ${opt_verbose} .bashrc.d/pipenv-venv-in-project.sh ~/.bashrc.d/pipenv-venv-in-project.sh
+[ ${opt_python3_virtualenv} == yes ] && copy ${opt_verbose} .bashrc.d/python3-virtualenv.sh ~/.bashrc.d/python3-virtualenv.sh
+find ~/.bashrc.d -type f -name '*.sh' -exec chmod u+x '{}' \;
+
+# Text lines that delimit the ~/.bashrc.d script calls in ~/.bashrc.
+block_start='# Paraselene Software Bash environment - Start of block'
+block_end='# Paraselene Software Bash environment - End of block'
+block_warning='# Do not remove or modify this line or any of the lines in this block.'
+
+# Install or replace the hook in ~/.bashrc.
+sed -i "/^${block_start}/,/^${block_end}/d" ~/.bashrc
+echo "${block_start}" >> ~/.bashrc
+echo "${block_warning}" >> ~/.bashrc
+cat << 'EOF' >> ~/.bashrc
+source "${HOME}/bin/source-bashrc.d-scripts.sh"
+EOF
+echo "${block_end}" >> ~/.bashrc
+
+exit 0
