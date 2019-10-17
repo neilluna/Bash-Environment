@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+# Keep this script idempotent. It will probably be called multiple times.
+
 if [ "${XDG_CACHE_HOME}" ]; then
 	if [ "$(readlink -f ${XDG_CACHE_HOME} | grep ^${HOME})" -a ! -d ${XDG_CACHE_HOME} ]; then
 		mkdir -p ${XDG_CACHE_HOME}
