@@ -47,7 +47,7 @@ verbose=no
 # NOTE: This requires GNU getopt. On Mac OS X and FreeBSD, you have to install this separately.
 ARGS=$(getopt -o hv -l help,verbose,version -n ${script_name} -- "${@}")
 if [ ${?} != 0 ]; then
-	exit 1
+	return 1
 fi
 
 # The quotes around "${ARGS}" are necessary.
@@ -58,7 +58,7 @@ while true; do
 	case "${1}" in
 		-h | --help)
 			echo_usage
-			exit 0
+			return 0
 			;;
 		-v | --verbose)
 			verbose=yes
@@ -66,7 +66,7 @@ while true; do
 			;;
 		--version)
 			echo "${script_version}"
-			exit 0
+			return 0
 			;;
 		--)
 			shift
@@ -77,9 +77,11 @@ done
 if [ ${#} -gt 0 ]; then
 	echo "${script_name}: Error: Invalid argument: ${1}" >&2
 	echo_usage
-	exit 1
+	return 1
 fi
 
 for script in "${HOME}"/.bashrc.d/*.sh; do
 	[ -f "${script}" ] && source "${script}"
 done
+
+return 0
