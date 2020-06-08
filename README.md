@@ -1,3 +1,2 @@
-# Bash environment
-
-Bash environment for Linux and Cygwin.
+# bash-environment
+A bash environment and scriplet framework for Linux and Cygwin
