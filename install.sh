@@ -161,7 +161,7 @@ sed -i "/^${block_start}/,/^${block_end}/d" ~/.bashrc
 echo "${block_start}" >> ~/.bashrc
 echo "${block_warning}" >> ~/.bashrc
 cat << 'EOF' >> ~/.bashrc
-source "${HOME}/bin/source-bashrc.d-scripts.sh"
+source ${HOME}/bin/source-bashrc.d-scripts.sh
 EOF
 echo "${block_end}" >> ~/.bashrc
 

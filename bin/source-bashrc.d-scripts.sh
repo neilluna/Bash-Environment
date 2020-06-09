@@ -80,8 +80,8 @@ if [ ${#} -gt 0 ]; then
 	return 1
 fi
 
-for script in "${HOME}"/.bashrc.d/*.sh; do
-	[ -f "${script}" ] && source "${script}"
+for script in ${HOME}/.bashrc.d/*.sh; do
+	source ${script}
 done
 
 return 0
