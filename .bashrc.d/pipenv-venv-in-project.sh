@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
 
-export PIPENV_VENV_IN_PROJECT=1
+# Keep this script idempotent. It will probably be called multiple times.
 
+export PIPENV_VENV_IN_PROJECT=1

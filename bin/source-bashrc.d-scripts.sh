@@ -10,9 +10,9 @@ function echo_usage()
 { 
 	echo "${script_name} - Version ${script_version}"
 	echo ""
-	echo "This script will clone a Git repository and set autocrlf and filemode to false."
+	echo "This script will source the scripts in the ~/.basrc.d directory."
 	echo ""
-	echo "Usage: ${script_name} [-v] remote [local]"
+	echo "Usage: source ${script_name}"
 	echo ""
 	echo "  -h, --help     Output this help information."
 	echo "  -v, --verbose  Verbose output."
@@ -42,14 +42,12 @@ function echo_color()
 }
 
 # Command-line switch variables.
-remote=
-local=
 verbose=no
 
 # NOTE: This requires GNU getopt. On Mac OS X and FreeBSD, you have to install this separately.
 ARGS=$(getopt -o hv -l help,verbose,version -n ${script_name} -- "${@}")
 if [ ${?} != 0 ]; then
-	exit 1
+	return 1
 fi
 
 # The quotes around "${ARGS}" are necessary.
@@ -60,7 +58,7 @@ while true; do
 	case "${1}" in
 		-h | --help)
 			echo_usage
-			exit 0
+			return 0
 			;;
 		-v | --verbose)
 			verbose=yes
@@ -68,7 +66,7 @@ while true; do
 			;;
 		--version)
 			echo "${script_version}"
-			exit 0
+			return 0
 			;;
 		--)
 			shift
@@ -76,44 +74,14 @@ while true; do
 			;;
 	esac
 done
-while [ ${#} -gt 0 ]; do
-	if [ -z "${remote}" ]; then
-		remote=${1}
-	elif [ -z "${local}" ]; then
-		local=${1}
-	else
-		echo "${script_name}: Error: Invalid argument: ${1}" >&2
-		echo_usage
-		exit 1
-	fi
-	shift
+if [ ${#} -gt 0 ]; then
+	echo "${script_name}: Error: Invalid argument: ${1}" >&2
+	echo_usage
+	return 1
+fi
+
+for script in "${HOME}"/.bashrc.d/*.sh; do
+	[ -f "${script}" ] && source "${script}"
 done
-if [ -z "${remote}" ]; then
-	echo "${script_name}: Error: Missing remote parameter." >&2
-	echo_usage ${0}
-	exit 1
-fi
-if [ -z "${local}" ]; then
-	local=$(basename -s .git ${remote})
-fi
-if [ -d ${local} ]; then
-	echo "${script_name}: Error: Directory '${local}' already exists." >&2
-	exit 1
-fi
 
-# Clone the repo and change to its directory.
-[ ${verbose} == yes ] && echo_color ${cyan} "Cloning ${remote} to ${local} ..."
-git clone ${remote} ${local} || exit 1
-cd ${local} || exit 1
-
-# Fix autocrlf and filemode.
-[ ${verbose} == yes ] && echo_color ${cyan} "Setting autocrlf to false ..."
-git config core.autocrlf false || exit 1
-[ ${verbose} == yes ] && echo_color ${cyan} "Setting filemode to false ..."
-git config core.filemode false || exit 1
-
-# Get the default branch name.
-default_branch=$(git remote show origin | grep "HEAD branch" | awk '{print $3}')
-[ ${verbose} == yes ] && echo_color ${cyan} "The default branch is '${default_branch}'"
-
-exit 0
+return 0
